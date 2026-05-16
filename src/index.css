@@ -1,0 +1,1029 @@
+/* ===================================================================
+   OBSIWEBS V2 — Direction artistique "Obsidienne"
+   Verre volcanique : noir profond, arêtes nettes, irisations froides
+   (violet / vert / bleu) qui n'apparaissent qu'au contact de la lumière.
+   =================================================================== */
+
+/* -------------------- Variables -------------------- */
+:root {
+    /* Noirs et profondeurs */
+    --obsidian-void: #050507;
+    --obsidian-deep: #0a0a0f;
+    --obsidian-surface: #111118;
+    --obsidian-edge: #1c1c26;
+
+    /* Irisations — les reflets de l'obsidienne réelle */
+    --sheen-violet: #7c5cff;
+    --sheen-green: #3df0b8;
+    --sheen-blue: #4aa8ff;
+    --sheen-cold: #a8b0d8;
+
+    /* Texte */
+    --text-bright: #f4f4f8;
+    --text-muted: rgba(244, 244, 248, 0.58);
+    --text-faint: rgba(244, 244, 248, 0.32);
+
+    /* Surfaces vitrées */
+    --glass: rgba(255, 255, 255, 0.025);
+    --glass-strong: rgba(255, 255, 255, 0.05);
+    --hairline: rgba(255, 255, 255, 0.07);
+    --hairline-bright: rgba(168, 176, 216, 0.22);
+
+    /* Géométrie — arêtes nettes, l'obsidienne se brise en éclats */
+    --radius-sharp: 4px;
+    --radius-soft: 10px;
+
+    --font-display: 'Sora', system-ui, sans-serif;
+    --font-mono: 'Spline Sans Mono', ui-monospace, monospace;
+
+    --section-max: 1080px;
+}
+
+/* -------------------- Reset -------------------- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    font-family: var(--font-display);
+    background: var(--obsidian-void);
+    color: var(--text-bright);
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Texture de grain très subtile sur tout le fond — donne de la matière */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.4;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+}
+
+img {
+    max-width: 100%;
+    display: block;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+::selection {
+    background: var(--sheen-violet);
+    color: var(--obsidian-void);
+}
+
+/* Respect de l'accessibilité : on coupe les animations si demandé */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* -------------------- Utilitaires -------------------- */
+.section {
+    position: relative;
+    z-index: 2;
+    max-width: var(--section-max);
+    margin: 0 auto;
+    padding: 120px 28px;
+}
+
+/* CORRECTION 3 : quand on clique un lien de nav, la section visée
+   s'arrête 100px avant le haut, pour ne pas passer sous la nav fixe */
+section[id] {
+    scroll-margin-top: 100px;
+}
+
+.section-label {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--sheen-green);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.section-label::before {
+    content: '';
+    width: 28px;
+    height: 1px;
+    background: var(--sheen-green);
+    opacity: 0.6;
+}
+
+.section-title {
+    font-size: clamp(1.8rem, 4vw, 2.7rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 48px;
+}
+
+/* Panneau "vitré" — surface d'obsidienne polie */
+.panel {
+    background: linear-gradient(150deg, var(--glass-strong), var(--glass));
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-soft);
+    position: relative;
+    overflow: hidden;
+}
+
+/* arête lumineuse en haut du panneau, comme un reflet sur la pierre */
+.panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--hairline-bright), transparent);
+}
+
+/* ===================================================================
+   NAVIGATION
+   =================================================================== */
+.nav {
+    position: fixed;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    width: min(94%, 1080px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 14px 12px 22px;
+    background: rgba(10, 10, 15, 0.72);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    border: 1px solid var(--hairline);
+    border-radius: 999px;
+    transition: border-color 0.4s ease, background 0.4s ease;
+}
+
+.nav.scrolled {
+    border-color: var(--hairline-bright);
+    background: rgba(10, 10, 15, 0.9);
+}
+
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.01em;
+}
+
+/* l'éclat d'obsidienne du logo */
+.nav-shard {
+    width: 16px;
+    height: 16px;
+    background: conic-gradient(from 45deg, var(--sheen-violet), var(--sheen-blue), var(--sheen-green), var(--sheen-violet));
+    clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+    filter: drop-shadow(0 0 6px rgba(124, 92, 255, 0.5));
+}
+
+.nav-links {
+    display: flex;
+    gap: 4px;
+}
+
+.nav-link {
+    font-size: 0.86rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    padding: 8px 15px;
+    border-radius: 999px;
+    transition: color 0.25s ease, background 0.25s ease;
+}
+
+.nav-link:hover {
+    color: var(--text-bright);
+}
+
+.nav-link.active {
+    color: var(--text-bright);
+    background: var(--glass-strong);
+}
+
+.nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text-bright);
+    width: 40px;
+    height: 40px;
+    font-size: 1.3rem;
+}
+
+/* ===================================================================
+   HERO
+   =================================================================== */
+.hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 0 28px;
+    z-index: 2;
+}
+
+/* le canvas du volcan-obsidienne, en fond */
+.hero-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+/* dégradé qui fond le canvas dans le reste de la page */
+.hero-canvas::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 55%, var(--obsidian-void) 100%);
+    pointer-events: none;
+}
+
+.hero-inner {
+    max-width: var(--section-max);
+    margin: 0 auto;
+    width: 100%;
+}
+
+.hero-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--sheen-cold);
+    margin-bottom: 22px;
+    opacity: 0;
+    animation: rise 0.8s ease 0.1s forwards;
+}
+
+.hero-title {
+    font-size: clamp(2.3rem, 6vw, 4.4rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.04;
+    max-width: 16ch;
+    margin-bottom: 26px;
+}
+
+.hero-title .word {
+    display: inline-block;
+    opacity: 0;
+    animation: rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* le mot mis en relief avec l'irisation obsidienne */
+.hero-title .sheen {
+    background: linear-gradient(110deg, var(--sheen-violet), var(--sheen-blue) 45%, var(--sheen-green));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero-lead {
+    font-size: clamp(1rem, 1.6vw, 1.12rem);
+    color: var(--text-muted);
+    max-width: 52ch;
+    margin-bottom: 36px;
+    opacity: 0;
+    animation: rise 0.8s ease 0.7s forwards;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: rise 0.8s ease 0.9s forwards;
+}
+
+/* Boutons — l'éclat tranchant de l'obsidienne */
+.btn {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.92rem;
+    padding: 13px 24px;
+    border-radius: var(--radius-sharp);
+    border: 1px solid transparent;
+    transition: transform 0.2s ease, box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--sheen-violet), var(--sheen-blue));
+    color: var(--obsidian-void);
+    box-shadow: 0 8px 30px rgba(124, 92, 255, 0.25);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(124, 92, 255, 0.4);
+}
+
+.btn-ghost {
+    background: var(--glass);
+    border-color: var(--hairline);
+    color: var(--text-bright);
+}
+
+.btn-ghost:hover {
+    border-color: var(--hairline-bright);
+    background: var(--glass-strong);
+    transform: translateY(-2px);
+}
+
+.hero-tags {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 40px;
+    opacity: 0;
+    animation: rise 0.8s ease 1.1s forwards;
+}
+
+.hero-tag {
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    color: var(--text-muted);
+    padding: 6px 12px;
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-sharp);
+    background: var(--glass);
+}
+
+/* ===================================================================
+   À PROPOS
+   =================================================================== */
+.about-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 30px;
+}
+
+.about-text {
+    font-size: 1.05rem;
+}
+
+.about-text p {
+    margin-bottom: 18px;
+    color: var(--text-muted);
+}
+
+.about-text p strong {
+    color: var(--text-bright);
+    font-weight: 600;
+}
+
+.about-text p:first-child {
+    color: var(--text-bright);
+    font-size: 1.15rem;
+}
+
+.about-card {
+    padding: 28px;
+    align-self: start;
+}
+
+.about-card h3 {
+    font-size: 0.82rem;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--sheen-green);
+    margin-bottom: 18px;
+}
+
+.about-fact {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--hairline);
+    font-size: 0.92rem;
+}
+
+.about-fact:last-child {
+    border-bottom: none;
+}
+
+.about-fact span:first-child {
+    color: var(--text-faint);
+}
+
+.about-fact span:last-child {
+    color: var(--text-bright);
+    text-align: right;
+    font-weight: 500;
+}
+
+/* ===================================================================
+   FAÇON DE TRAVAILLER
+   =================================================================== */
+.process-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+}
+
+.process-item {
+    padding: 30px;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.process-item:hover {
+    transform: translateY(-4px);
+    border-color: var(--hairline-bright);
+}
+
+.process-num {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--sheen-violet);
+    margin-bottom: 14px;
+}
+
+.process-item h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+}
+
+.process-item p {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+}
+
+/* ===================================================================
+   PROJETS — CARROUSEL
+   =================================================================== */
+.carousel-wrap {
+    position: relative;
+}
+
+.carousel-controls {
+    display: flex;
+    gap: 8px;
+    position: absolute;
+    top: -64px;
+    right: 0;
+}
+
+.carousel-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: var(--radius-sharp);
+    background: var(--glass);
+    border: 1px solid var(--hairline);
+    color: var(--text-bright);
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.25s ease, background 0.25s ease, opacity 0.25s ease;
+}
+
+.carousel-btn:hover {
+    border-color: var(--hairline-bright);
+    background: var(--glass-strong);
+}
+
+.carousel-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.carousel-track {
+    display: flex;
+    gap: 22px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    padding-bottom: 18px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--hairline-bright) transparent;
+}
+
+.carousel-track::-webkit-scrollbar {
+    height: 6px;
+}
+
+.carousel-track::-webkit-scrollbar-thumb {
+    background: var(--hairline-bright);
+    border-radius: 999px;
+}
+
+.project-card {
+    scroll-snap-align: start;
+    flex: 0 0 clamp(300px, 78vw, 420px);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.project-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--hairline-bright);
+}
+
+.project-thumb {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    background: linear-gradient(135deg, var(--obsidian-edge), var(--obsidian-deep));
+    border-bottom: 1px solid var(--hairline);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.project-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* placeholder quand pas d'image encore */
+.project-thumb-placeholder {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-faint);
+    letter-spacing: 0.1em;
+}
+
+.project-status {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 9px;
+    border-radius: var(--radius-sharp);
+    background: rgba(5, 5, 7, 0.85);
+    border: 1px solid var(--hairline);
+}
+
+.project-status.live {
+    color: var(--sheen-green);
+    border-color: rgba(61, 240, 184, 0.3);
+}
+
+.project-status.wip {
+    color: var(--sheen-cold);
+}
+
+.project-body {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.project-kind {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    color: var(--sheen-violet);
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+}
+
+.project-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-bottom: 12px;
+}
+
+.project-desc {
+    font-size: 0.92rem;
+    color: var(--text-muted);
+    margin-bottom: 18px;
+}
+
+.project-stack {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.project-stack span {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    padding: 4px 9px;
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-sharp);
+    color: var(--text-muted);
+}
+
+.project-links {
+    margin-top: auto;
+    display: flex;
+    gap: 16px;
+}
+
+.project-link {
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--sheen-blue);
+    transition: gap 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.project-link:hover {
+    gap: 9px;
+}
+
+.project-link.muted {
+    color: var(--text-faint);
+    cursor: default;
+}
+
+/* ===================================================================
+   CONTACT
+   =================================================================== */
+.contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    align-items: start;
+}
+
+.contact-intro p {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    margin-bottom: 24px;
+}
+
+.contact-channels {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.contact-channel {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-sharp);
+    margin-bottom: 8px;
+    transition: border-color 0.25s ease, background 0.25s ease;
+}
+
+.contact-channel:hover {
+    border-color: var(--hairline-bright);
+    background: var(--glass);
+}
+
+.contact-channel-icon {
+    font-family: var(--font-mono);
+    color: var(--sheen-green);
+    font-size: 0.9rem;
+}
+
+.contact-channel-label {
+    font-size: 0.7rem;
+    color: var(--text-faint);
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.contact-channel-value {
+    font-size: 0.92rem;
+    color: var(--text-bright);
+}
+
+.contact-form {
+    padding: 30px;
+}
+
+.form-field {
+    margin-bottom: 16px;
+}
+
+.form-field label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-faint);
+    margin-bottom: 7px;
+}
+
+.form-field input,
+.form-field textarea {
+    width: 100%;
+    background: var(--obsidian-void);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-sharp);
+    padding: 12px 14px;
+    color: var(--text-bright);
+    font-family: var(--font-display);
+    font-size: 0.94rem;
+    transition: border-color 0.25s ease;
+}
+
+.form-field input:focus,
+.form-field textarea:focus {
+    outline: none;
+    border-color: var(--sheen-violet);
+}
+
+.form-field textarea {
+    resize: vertical;
+    min-height: 110px;
+}
+
+.form-message {
+    font-size: 0.88rem;
+    margin-top: 12px;
+    font-family: var(--font-mono);
+}
+
+.form-message.ok {
+    color: var(--sheen-green);
+}
+
+.form-message.err {
+    color: #ff7a7a;
+}
+
+/* ===================================================================
+   FOOTER
+   =================================================================== */
+.footer {
+    position: relative;
+    z-index: 2;
+    border-top: 1px solid var(--hairline);
+    padding: 56px 28px 40px;
+}
+
+.footer-inner {
+    max-width: var(--section-max);
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 32px;
+}
+
+.footer-brand {
+    max-width: 280px;
+}
+
+.footer-brand .nav-brand {
+    margin-bottom: 12px;
+}
+
+.footer-brand p {
+    font-size: 0.86rem;
+    color: var(--text-faint);
+}
+
+.footer-col h4 {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-faint);
+    margin-bottom: 14px;
+}
+
+.footer-col a {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    padding: 5px 0;
+    transition: color 0.2s ease;
+}
+
+.footer-col a:hover {
+    color: var(--sheen-blue);
+}
+
+.footer-bottom {
+    max-width: var(--section-max);
+    margin: 40px auto 0;
+    padding-top: 24px;
+    border-top: 1px solid var(--hairline);
+    font-size: 0.8rem;
+    color: var(--text-faint);
+    font-family: var(--font-mono);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* Blason au-dessus du nom dans le footer */
+.footer-blason {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 16px;
+    filter: drop-shadow(0 0 12px rgba(124, 92, 255, 0.25));
+}
+
+/* Liens réseaux avec icône Lucide */
+.footer-social {
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
+}
+
+.footer-social svg {
+    flex-shrink: 0;
+    transition: color 0.2s ease;
+}
+
+.footer-social:hover svg {
+    color: var(--sheen-blue);
+}
+
+/* ===================================================================
+   ANIMATIONS
+   =================================================================== */
+@keyframes rise {
+    from {
+        opacity: 0;
+        transform: translateY(22px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Révélation au scroll */
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ===================================================================
+   RESPONSIVE
+   =================================================================== */
+@media (max-width: 860px) {
+
+    .about-grid,
+    .process-grid,
+    .contact-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .section {
+        padding: 90px 22px;
+    }
+
+    /* CORRECTION 2 : le contenu du hero démarre sous la nav fixe */
+    .hero {
+        padding-top: 120px;
+    }
+
+    .nav-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* CORRECTION 1 : menu mobile fluide.
+     Le menu reste dans le DOM (display: flex), mais il est invisible
+     et non cliquable (opacity 0 + visibility hidden + léger décalage).
+     L'ajout de .open anime opacity + transform en douceur. */
+    .nav-links {
+        position: absolute;
+        top: calc(100% + 12px);
+        right: 0;
+        flex-direction: column;
+        gap: 2px;
+        background: linear-gradient(160deg, rgba(20, 20, 28, 0.98), rgba(10, 10, 15, 0.98));
+        -webkit-backdrop-filter: blur(18px);
+        backdrop-filter: blur(18px);
+        border: 1px solid var(--hairline-bright);
+        border-radius: var(--radius-soft);
+        padding: 10px;
+        min-width: 200px;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+        display: flex;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px) scale(0.98);
+        transform-origin: top right;
+        transition: opacity 0.28s ease,
+            transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1),
+            visibility 0.28s;
+    }
+
+    .nav-links.open {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0) scale(1);
+    }
+
+    /* chaque lien part légèrement décalé... */
+    .nav-links .nav-link {
+        opacity: 0;
+        transform: translateX(8px);
+        transition: opacity 0.3s ease,
+            transform 0.3s ease,
+            color 0.25s ease,
+            background 0.25s ease;
+    }
+
+    /* ...et apparaît en cascade quand le menu s'ouvre */
+    .nav-links.open .nav-link {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .nav-links.open .nav-link:nth-child(1) {
+        transition-delay: 0.04s;
+    }
+
+    .nav-links.open .nav-link:nth-child(2) {
+        transition-delay: 0.08s;
+    }
+
+    .nav-links.open .nav-link:nth-child(3) {
+        transition-delay: 0.12s;
+    }
+
+    .nav-links.open .nav-link:nth-child(4) {
+        transition-delay: 0.16s;
+    }
+
+    .nav-links.open .nav-link:nth-child(5) {
+        transition-delay: 0.20s;
+    }
+
+    .carousel-controls {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-actions {
+        flex-direction: column;
+    }
+
+    .hero-actions .btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+    }
+}
