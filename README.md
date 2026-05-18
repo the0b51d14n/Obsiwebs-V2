@@ -41,7 +41,7 @@ Conçu et codé à Lille — chaque choix technique est documenté, chaque compo
 ### Supinfo.TV V2
 Plateforme VOD développée en projet d'école. PHP / MySQL / Docker / API TMDB.  
 Premier contact avec le back-end et la conteneurisation, appris en autonomie.  
-→ [Dépôt GitHub](https://github.com/the0b51d14n)
+→ [Dépôt GitHub](https://github.com/the0b51d14n/Supinfo.TV-V2)
 
 ### Au Trés'Or des Sens
 Site vitrine pour une vraie cliente — entreprise de massages à domicile.  
@@ -52,7 +52,7 @@ Première expérience de la relation client.
 ### Obsiwebs — Portfolio
 Ce portfolio lui-même, V1 → V2. React / Vite / Canvas 2D.  
 Leçon principale : savoir reprendre son propre travail d'un œil critique.  
-→ [www.obsiwebs.com](https://www.obsiwebs.com)
+→ [www.obsiwebs.com](https://the0b51d14n.github.io/obsiwebs/)
 
 ---
 
