@@ -56,7 +56,7 @@ export const projects = [
     stack: ['React', 'Canvas API', 'CSS'],
     image: '/assets/obsiwebsV1.png',
     links: [
-      { label: 'Voir le code', url: 'https://github.com/the0b51d14n/obsiwebs', type: 'repo' },
+      { label: 'Voir le site', url: 'https://obsiwebs-v1.vercel.app/', type: 'repo' },
     ],
   },
 ];
