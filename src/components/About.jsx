@@ -50,7 +50,7 @@ export default function About() {
             </div>
             <div className="about-fact">
               <span>Année</span>
-              <span>é7me année</span>
+              <span>2ème année</span>
             </div>
             <div className="about-fact">
               <span>Recherche</span>
