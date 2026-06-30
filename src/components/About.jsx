@@ -50,11 +50,11 @@ export default function About() {
             </div>
             <div className="about-fact">
               <span>Année</span>
-              <span>1ère année (bientôt 2ème année)</span>
+              <span>é7me année</span>
             </div>
             <div className="about-fact">
               <span>Recherche</span>
-              <span>Stage (2 mois min.)<br />puis alternance à partir de sept. 2026</span>
+              <span>alternance à partir de sept. 2026</span>
             </div>
             <div className="about-fact">
               <span>Objectif</span>
