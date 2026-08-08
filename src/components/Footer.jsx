@@ -87,7 +87,7 @@ export default function Footer() {
           </a>
 
           <a
-            href="https://www.instagram.com/obsiwebs/"
+            href="https://www.instagram.com/orivex.exe/"
             target="_blank"
             rel="noopener noreferrer"
             className="footer-social"
